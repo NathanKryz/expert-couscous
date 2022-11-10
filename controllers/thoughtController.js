@@ -25,7 +25,6 @@ module.exports = {
     // Get thought by ID
     getSingleThought(req, res) {
         Thought.findOne({_id: req.params.thoughtId})
-        .select('-__v')
         .then(async (thought) =>
             !thought
                 ? res.status(404).json({message: 'No thought with that ID'})
@@ -44,8 +43,8 @@ module.exports = {
             Thought.create(req.body)
             .then((thought) => {
                 return User.findOneAndUpdate(
-                    {_id: req.body.userId},
-                    {$push: { thoughts: thought._id}},
+                    {username: req.body.userName},
+                    {$push: { thoughts: req.body}},
                     {new: true}
                 );
             })
@@ -101,7 +100,6 @@ module.exports = {
     // Post a reaction to a thought
         addReaction(req, res){
             console.log("Adding reaction");
-            console.log(req.body);
             Thought.findOneAndUpdate(
                 {_id: req.params.thoughtId},
                 {$addToSet: {reactions: req.body}},
@@ -119,7 +117,7 @@ module.exports = {
             console.log("Removing reaction")
             Thought.findOneAndUpdate(
                 {_id: req.params.thoughtId},
-                { $pull: { reaction: {reactionId: req.params.reactionId} } },
+                { $pull: { reactions: {reactionId: req.params.reactionId} } },
                 {runValidators: true, new: true}
             )
             .then((thought) =>

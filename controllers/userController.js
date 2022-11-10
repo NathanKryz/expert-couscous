@@ -6,6 +6,8 @@ module.exports = {
     // Get all users
     getUser(req, res) {
         User.find()
+        .populate('thoughts')
+        .populate('friends')
         .then(async (users) =>{
             const userObj = {
                 users,
@@ -20,7 +22,6 @@ module.exports = {
     // Get User by ID
     getSingleUser(req, res) {
         User.findOne({_id: req.params.userId})
-        .select('-__v')
         .then(async (user) =>
             !user
                 ? res.status(404).json({message: 'No user with that ID'})
@@ -84,10 +85,9 @@ module.exports = {
     // Add a friend
         addFriend(req, res){
             console.log("Adding friend");
-            console.log(req.body);
             User.findOneAndUpdate(
                 {_id: req.params.userId},
-                {$addToSet: {friends: req.body}},
+                {$addToSet: {friends: { userId: req.param.friendId} }},
                 { runValidators: true, new: true}
             )
             .then((user) =>
@@ -97,12 +97,12 @@ module.exports = {
             )
             .catch((err) => res.status(500).json(err));
         },
-    // Delete a reaction to a thought
+    // Delete a friend from a user
         removeFriend(req, res) {
             console.log("Removing friend")
             User.findOneAndUpdate(
                 {_id: req.params.userId},
-                { $pull: { friends: {userId: req.params.userId} } },
+                { $pull: { friends:  req.params.friendId} },
                 {runValidators: true, new: true}
             )
             .then((user) =>
