@@ -44,7 +44,7 @@ module.exports = {
             .then((thought) => {
                 return User.findOneAndUpdate(
                     {username: req.body.userName},
-                    {$push: { thoughts: req.body}},
+                    {$push: { thoughts: thought._id}},
                     {new: true}
                 );
             })

@@ -22,6 +22,8 @@ module.exports = {
     // Get User by ID
     getSingleUser(req, res) {
         User.findOne({_id: req.params.userId})
+        .populate('thoughts')
+        .populate('friends')
         .then(async (user) =>
             !user
                 ? res.status(404).json({message: 'No user with that ID'})
@@ -87,7 +89,7 @@ module.exports = {
             console.log("Adding friend");
             User.findOneAndUpdate(
                 {_id: req.params.userId},
-                {$addToSet: {friends: { userId: req.param.friendId} }},
+                {$addToSet: {friends: req.params.friendId }},
                 { runValidators: true, new: true}
             )
             .then((user) =>
