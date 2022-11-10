@@ -23,12 +23,13 @@ const reactionSchema = new Schema(
                 return date.toLocaleString();
               }
         },
-    
+    },
+    {
     toJSON: {
         getters: true,
     },
     id: true,
-}
+  }
 );
 
 module.exports = reactionSchema;
